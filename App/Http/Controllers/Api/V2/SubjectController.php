@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\V2;
 
 use App\Models\Subject;
 use Illuminate\Http\Request;
+use App\Http\Services\CacheService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SubjectResource;
+use App\Http\Requests\StoreSubjectRequest;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class SubjectController extends Controller
@@ -16,18 +18,21 @@ class SubjectController extends Controller
     public function index(): JsonResource
     {
         return SubjectResource::collection(
-            Subject::paginate(
-                config('app.paginate')
-            )
+            CacheService::getAll(function () {
+                return Subject::paginate($this->paginate);
+            })
         );
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreSubjectRequest $request)
     {
-        //
+        $subject = Subject::create($request->validated());
+        CacheService::forgetCache();
+
+        return SubjectResource::make($subject->fresh());
     }
 
     /**
