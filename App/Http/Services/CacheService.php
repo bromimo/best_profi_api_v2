@@ -24,7 +24,36 @@ class CacheService
         $page = is_null($page) ? 1 : $page;
         $cache_name = self::getClosureCacheName($callback);
 
-        return Cache::remember($cache_name . $page, config('app.cache_ttl'), $callback);
+        return Cache::remember($cache_name . '-page-' . $page, config('app.cache_ttl'), $callback);
+    }
+
+    /** Очищает все страницы кэша.
+     * @return void
+     */
+    public static function forgetCache(): void
+    {
+        $class_path = debug_backtrace()[1]['class'];
+        $cache_name = self::getCacheName($class_path);
+        for ($i = 1; $i < 1000; $i++) {
+            if (Cache::has($cache_name . '-page-' . $i)) {
+                Cache::forget($cache_name . '-page-' . $i);
+            } else {
+                break;
+            }
+        }
+    }
+
+    /** Получает имя кэша из пути класса.
+     * @param string $class_path
+     * @return string
+     */
+    private static function getCacheName(string $class_path): string
+    {
+        $tmp = explode('\\', $class_path);
+        $class_name = array_pop($tmp);
+        $cache_name = str_replace('Controller', '', $class_name);
+
+        return strtolower($cache_name);
     }
 
     /** Получает имя кэша из класса замыкания.
@@ -36,29 +65,7 @@ class CacheService
     {
         $reflectionClosure = new ReflectionFunction($callback);
         $class_path = $reflectionClosure->getClosureScopeClass()->getName();
-        $tmp = explode('\\', $class_path);
-        $class_name = array_pop($tmp);
-        $cache_name = str_replace('Controller', '', $class_name);
 
-        return strtolower($cache_name);
-    }
-
-    /** Очищает кэш.
-     * @return void
-     */
-    public static function forgetCache(): void
-    {
-        $class_path = debug_backtrace()[1]['class'];
-        $tmp = explode('\\', $class_path);
-        $class_name = array_pop($tmp);
-        $cache_name = str_replace('Controller', '', $class_name);
-        $cache_name = strtolower($cache_name);
-        for ($i = 1; $i < 1000; $i++) {
-            if (Cache::has($cache_name . $i)) {
-                Cache::forget($cache_name . $i);
-            } else {
-                break;
-            }
-        }
+        return self::getCacheName($class_path);
     }
 }

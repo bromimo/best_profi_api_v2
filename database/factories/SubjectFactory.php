@@ -9,12 +9,31 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class SubjectFactory extends Factory
 {
-    const GENDER_MALE = 'male';
+    const GENDER_MALE   = 'male';
     const GENDER_FEMALE = 'female';
 
     const GENDER = [
         self::GENDER_MALE,
         self::GENDER_FEMALE
+    ];
+
+    const MOBILE_CODES = [
+        '039',
+        '050',
+        '063',
+        '066',
+        '067',
+        '068',
+        '073',
+        '091',
+        '092',
+        '093',
+        '094',
+        '095',
+        '096',
+        '097',
+        '098',
+        '099'
     ];
 
     /**
@@ -26,7 +45,9 @@ class SubjectFactory extends Factory
         $gender = $this->faker->randomElement(self::GENDER);
 
         return [
-            'phone'      => $this->faker->unique()->e164PhoneNumber,
+            'phone'      => '+38' . $this->faker->unique()->numerify(
+                    $this->faker->randomElement(self::MOBILE_CODES) . '#######'
+                ),
             'first_name' => $this->faker->firstName($gender),
             'last_name'  => $this->faker->lastName($gender)
         ];
