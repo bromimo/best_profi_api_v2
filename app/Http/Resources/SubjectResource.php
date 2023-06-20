@@ -15,9 +15,9 @@ class SubjectResource extends JsonResource
     {
         return [
             'id'         => $this->id,
-            'phone'      => $this->phone,
             'first_name' => $this->first_name,
             'last_name'  => $this->last_name,
+            'phones' => PhoneResource::collection($this->phones)
         ];
     }
 }

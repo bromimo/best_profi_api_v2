@@ -23,7 +23,7 @@ class StoreSubjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone'      => ['required', 'regex:' . Constant::REGEX_PHONE, 'unique:subjects,phone'],
+//            'phone'      => ['required', 'regex:' . Constant::REGEX_PHONE, 'unique:subjects,phone'],
             'first_name' => ['required', 'string', 'max:64'],
             'last_name'  => ['sometimes', 'string', 'max:64']
         ];

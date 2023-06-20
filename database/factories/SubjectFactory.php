@@ -17,25 +17,6 @@ class SubjectFactory extends Factory
         self::GENDER_FEMALE
     ];
 
-    const MOBILE_CODES = [
-        '039',
-        '050',
-        '063',
-        '066',
-        '067',
-        '068',
-        '073',
-        '091',
-        '092',
-        '093',
-        '094',
-        '095',
-        '096',
-        '097',
-        '098',
-        '099'
-    ];
-
     /**
      * Define the model's default state.
      * @return array<string, mixed>
@@ -45,9 +26,6 @@ class SubjectFactory extends Factory
         $gender = $this->faker->randomElement(self::GENDER);
 
         return [
-            'phone'      => '+38' . $this->faker->unique()->numerify(
-                    $this->faker->randomElement(self::MOBILE_CODES) . '#######'
-                ),
             'first_name' => $this->faker->firstName($gender),
             'last_name'  => $this->faker->lastName($gender)
         ];
