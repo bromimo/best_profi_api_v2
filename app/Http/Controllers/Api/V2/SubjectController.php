@@ -7,6 +7,7 @@ use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use App\Http\Services\CacheService;
 use App\Http\Controllers\Controller;
+use App\Http\Services\SubjectService;
 use App\Http\Resources\SubjectResource;
 use App\Http\Requests\StoreSubjectRequest;
 use App\Http\Requests\UpdateSubjectRequest;
@@ -14,6 +15,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class SubjectController extends Controller
 {
+    protected SubjectService $service;
+
+    public function __construct(SubjectService $service)
+    {
+        parent::__construct();
+        $this->service = $service;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -21,7 +30,7 @@ class SubjectController extends Controller
     {
         return SubjectResource::collection(
             CacheService::getAll(function () {
-                return Subject::paginate($this->paginate);
+                return Subject::with('phones')->paginate($this->paginate);
             })
         );
     }
@@ -31,10 +40,9 @@ class SubjectController extends Controller
      */
     public function store(StoreSubjectRequest $request): JsonResource
     {
-        $subject = Subject::create($request->validated());
-        CacheService::forgetCache();
+        $subject = $this->service->store($request->validated());
 
-        return SubjectResource::make($subject->fresh());
+        return SubjectResource::make($subject);
     }
 
     /**
@@ -50,10 +58,9 @@ class SubjectController extends Controller
      */
     public function update(UpdateSubjectRequest $request, Subject $subject): JsonResource
     {
-        $subject->update($request->validated());
-        CacheService::forgetCache();
+        $subject = $this->service->update($subject, $request->validated());
 
-        return SubjectResource::make($subject->fresh());
+        return SubjectResource::make($subject);
     }
 
     /**

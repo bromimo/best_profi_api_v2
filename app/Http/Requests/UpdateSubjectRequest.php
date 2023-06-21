@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Assistants\Constant;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
 
@@ -22,9 +23,18 @@ class UpdateSubjectRequest extends FormRequest
      */
     public function rules(): array
     {
+
         return [
             'first_name' => ['required', 'string', 'max:64'],
-            'last_name'  => ['sometimes', 'string', 'max:64']
+            'last_name'  => ['sometimes', 'string', 'max:64'],
+            'phones'         => ['required', 'array'],
+            'phones.*.phone' => [
+                'required',
+                'phone',
+                Rule::unique('phones')->where(function ($query) {
+                    $query->whereNot('subject_id', $this->subject->id);
+                })
+            ]
         ];
     }
 }

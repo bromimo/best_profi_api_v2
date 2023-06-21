@@ -28,11 +28,12 @@ class CacheService
     }
 
     /** Очищает все страницы кэша.
+     * @param string|null $class_path
      * @return void
      */
-    public static function forgetCache(): void
+    public static function forgetCache(?string $class_path = null): void
     {
-        $class_path = debug_backtrace()[1]['class'];
+        $class_path = $class_path ?? debug_backtrace()[1]['class'];
         $cache_name = self::getCacheName($class_path);
         for ($i = 1; $i < 1000; $i++) {
             if (Cache::has($cache_name . '-page-' . $i)) {

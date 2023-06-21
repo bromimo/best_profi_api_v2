@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Assistants\Constant;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Validator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Validator::extend('phone', function ($attribute, $value) {
+            return preg_match(Constant::REGEX_PHONE, $value);
+        });
+
     }
 }
